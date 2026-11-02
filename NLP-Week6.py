@@ -51,7 +51,7 @@ def clean_text(text, do_lemmatize=True, remove_digits=True):
     #lemmatize
     if do_lemmatize:
         tokens = [lemmatizer.lemmatize(t) for t in tokens]
-    return ''.join(tokens)
+    return ' '.join(tokens)
 #Apply to a small sample first (fast)
 imdb_sample = imdb.sample(2000, random_state= 42).copy()
 imdb_sample['clean']= imdb_sample['review'].apply(clean_text)
@@ -65,11 +65,12 @@ print("==============Step 4 — Feature extraction: CountVectorizer & TF-IDF====
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 max_feat = 5000
-bow_vec = CountVectorizer(max_features=max_feat, ngram_range = (1,1))
-tfidf_vec = TfidfVectorizer(max_features=max_feat, ngram_range = (1,1))
+bow_vec = CountVectorizer(max_features=max_feat, ngram_range = (1,2))
+tfidf_vec = TfidfVectorizer(max_features=max_feat, ngram_range = (1,2))
 
 X_bow = bow_vec.fit_transform(imdb['clean'])
 X_tfidf = tfidf_vec.fit_transform(imdb['clean'])
+
 print("BOW shape:",X_bow.shape)
 print("TFIDF shape:",X_tfidf.shape)
 
@@ -103,3 +104,10 @@ lr.fit(X_tr_bow, y_tr)
 lr_pred = lr.predict(X_te_bow)
 
 print("LR(BOW) acc:", accuracy_score(y_te,lr_pred))
+print("==============Step 7 — Small model competition================")
+
+# change ngram or features
+vec2 = TfidfVectorizer(max_features=8000, ngram_range=(1,3))
+X2 = vec2.fit_transform(imdb['clean'])
+
+
